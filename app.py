@@ -6,8 +6,10 @@ from firebase_admin import credentials, firestore
 app = Flask(__name__)
 CORS(app)
 
-# Inicializar Firebase
-cred = credentials.Certificate("appzoo-e0319-firebase-adminsdk-fbsvc-23c0864789.json")
+import os, json
+
+json_cred = os.environ.get("GOOGLE_APPLICATION_CREDENTIALS_JSON")
+cred = credentials.Certificate(json.loads(json_cred))
 firebase_admin.initialize_app(cred)
 db = firestore.client()
 
