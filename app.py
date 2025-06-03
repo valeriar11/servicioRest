@@ -60,6 +60,31 @@ def listar_especies():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+@app.route('/promedio_edad', methods=['POST'])
+def promedio_edad():
+    data = request.get_json()
+    especie_nombre = data.get('especie')
+
+    if not especie_nombre:
+        return jsonify({'error': 'Falta el nombre de la especie'}), 400
+
+    try:
+        animales_ref = db.collection('animales')
+        query = animales_ref.where('especie', '==', especie_nombre)
+        docs = query.stream()
+
+        edades = [doc.to_dict().get('edad', 0) for doc in docs]
+        if not edades:
+            return jsonify({'especie': especie_nombre, 'promedioEdad': 0})
+
+        promedio = sum(edades) / len(edades)
+        return jsonify({
+            'especie': especie_nombre,
+            'promedioEdad': round(promedio, 2)
+        })
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 
 # 🔻 Esto debe estar AL FINAL DEL ARCHIVO
